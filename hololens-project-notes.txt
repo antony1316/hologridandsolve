@@ -1,0 +1,59 @@
+GestureManager
+-----
+gestureRecognizer.SetRecognizableGestures(GestureSettings.Tap);
+gestureRecognizer.TappedEvent += GestureRecognizer_TappedEvent;
+OR
+Input.GetMouseButtonDown(1) || Input.GetKeyDown(EditorSelectKey)
+    focusedObject.SendMessage("OnSelect");
+
+MouseInput
+-----
+if (Input.GetMouseButtonDown(1))
+    InputManager.Instance.TriggerTapPress();
+else if (Input.GetMouseButtonUp(1))
+    InputManager.Instance.TriggerTapRelease();
+
+InputManager
+-----
+KeyboardInput.Instance.RegisterKeyEvent(new KeyboardInput.KeyCodeEventPair(KeyCode.Space, KeyboardInput.KeyEvent.KeyReleased), FakeTapKeyboardHandler);
+    GameManager.Instance.OnSelect();
+KeyboardInput.Instance.RegisterKeyEvent(new KeyboardInput.KeyCodeEventPair(KeyCode.Backspace, KeyboardInput.KeyEvent.KeyReleased), FakeBackKeyboardHandler);
+    GameManager.Instance.OnClear();
+
+gestureRecognizer.SetRecognizableGestures(GestureSettings.Hold | GestureSettings.Tap |
+    GestureSettings.NavigationY | GestureSettings.NavigationX);
+gestureRecognizer.TappedEvent += OnTapped;
+    GameManager.Instance.OnSelect();
+
+GameManager
+-----
+InputManager.Instance.TapPressAction += OnSelect;
+    GameManager.Instance.GrabbedGameObject.SendMessage("OnSelect");
+InputManager.Instance.TapReleaseAction += OnRelease;
+    GameManager.Instance.GrabbedGameObject = null;
+
+###
+Tap:
+the GestureManager sends OnSelect message to object in focus
+the InputManager sends OnSelect message via OnTapped to GameManager 
+    the GameManager sends OnSelect to grabbed game object
+
+Mouse Button 1:
+the MouseInput sends TriggerTapPress action to InputManager
+    the InputManager sends OnSelect to GameManager
+    the GameManager sends OnSelect to grabbed game object
+
+Mouse Button 1:
+the GestureManager sends OnSelect message to object in focus
+
+Key Space:
+the InputManager sends OnSelect message via OnTapped to GameManager
+    the GameManager sends OnSelect to grabbed game object
+
+Key Backspace:
+the InputManager sends OnClear to GameManager
+    the GameManager sends RemoveRoom to LevelGenerator
+
+
+
+
